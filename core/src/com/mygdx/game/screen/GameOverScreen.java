@@ -67,6 +67,9 @@ public class GameOverScreen implements Screen {
 		GlyphLayout highscoreLayout = new GlyphLayout(font, "Highscore: "+highscore, Color.RED, 0, Align.center, false);
 		font.draw(game.batch, highscoreLayout, Gdx.graphics.getWidth()/2 , Gdx.graphics.getHeight()/2 - HEIGHT);
 		
+		GlyphLayout continueMessage = new GlyphLayout(font, "Press SPACE to continue...");
+		font.draw(game.batch, continueMessage, Gdx.graphics.getWidth()/2 - continueMessage.width/2, Gdx.graphics.getHeight()/2 - HEIGHT *1.5f);
+		
 		x = Gdx.graphics.getWidth()/2 - WIDTH/2;
 		y = Gdx.graphics.getHeight()/2 + HEIGHT/2;
 		game.batch.draw(img1, x, y, WIDTH, HEIGHT);

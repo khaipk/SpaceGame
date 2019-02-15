@@ -18,6 +18,7 @@ import com.mygdx.game.SpaceGame;
 import com.mygdx.game.items.Bullet;
 import com.mygdx.game.items.Collision;
 import com.mygdx.game.items.Enemy;
+import com.mygdx.game.items.EnemyShip;
 import com.mygdx.game.tools.CheckCollision;
 
 public class GameScreen implements Screen {
@@ -31,6 +32,8 @@ public class GameScreen implements Screen {
 	private static ArrayList<Collision> collisions;
 
 	private static ArrayList<Enemy> enemies;
+	private static ArrayList<EnemyShip> enemyShips;
+	private int scoreToEnemyShip;
 
 	private static final float MIN_ENEMY_TIME = 1.5f;
 	private static final float MAX_ENEMY_TIME = 3.5f;
@@ -73,6 +76,7 @@ public class GameScreen implements Screen {
 		bullets = new ArrayList<Bullet>();
 		enemies = new ArrayList<Enemy>();
 		collisions = new ArrayList<Collision>();
+		enemyShips = new ArrayList<EnemyShip>();
 
 		x = SpaceGame.WIDTH/2 - WIDTH/2;
 		player = new CheckCollision(x, DEFAULT_Y, WIDTH, HEIGHT);
@@ -231,12 +235,19 @@ public class GameScreen implements Screen {
 					removeBullet.add(bullet);
 					removeEnemy.add(enemy);
 					score += 100;
+					scoreToEnemyShip += 1;
 					collisions.add(new Collision(enemy.x, enemy.y));
 				}
 			}
 		}
 		bullets.removeAll(removeBullet);
 		enemies.removeAll(removeEnemy);
+		
+		//creat enemy ship
+		if(scoreToEnemyShip > 10) {
+			scoreToEnemyShip = 0;
+			enemyShips.add(new EnemyShip(x));
+		}
 
 		//update collision
 		ArrayList<Collision> removeCollision = new ArrayList<Collision>();
@@ -277,6 +288,11 @@ public class GameScreen implements Screen {
 		// draw score
 		GlyphLayout scoreLayout = new GlyphLayout(scoreFont, ""+score, Color.WHITE, 0, Align.center, false);
 		scoreFont.draw(game.batch, scoreLayout, Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()-15);
+		
+		//draw enemy ship
+		for(EnemyShip enemyShip: enemyShips) {
+			enemyShip.updateAndRender(game.batch, delta);
+		}
 
 		//draw enemies
 		for(Enemy enemy: enemies) {
