@@ -19,6 +19,7 @@ import com.mygdx.game.items.Bullet;
 import com.mygdx.game.items.Collision;
 import com.mygdx.game.items.Enemy;
 import com.mygdx.game.items.EnemyShip;
+import com.mygdx.game.items.EnemyShipFire;
 import com.mygdx.game.tools.CheckCollision;
 
 public class GameScreen implements Screen {
@@ -34,6 +35,10 @@ public class GameScreen implements Screen {
 	private static ArrayList<Enemy> enemies;
 	private static ArrayList<EnemyShip> enemyShips;
 	private int scoreToEnemyShip;
+	
+	private static ArrayList<EnemyShipFire> enemyShipFires;
+	private static final float ENEMY_SHIP_FIRE_TIME = 1f;
+	private float enemyShipFireTime;
 
 	private static final float MIN_ENEMY_TIME = 1.5f;
 	private static final float MAX_ENEMY_TIME = 3.5f;
@@ -77,6 +82,7 @@ public class GameScreen implements Screen {
 		enemies = new ArrayList<Enemy>();
 		collisions = new ArrayList<Collision>();
 		enemyShips = new ArrayList<EnemyShip>();
+		enemyShipFires = new ArrayList<EnemyShipFire>();
 
 		x = SpaceGame.WIDTH/2 - WIDTH/2;
 		player = new CheckCollision(x, DEFAULT_Y, WIDTH, HEIGHT);
@@ -240,15 +246,51 @@ public class GameScreen implements Screen {
 				}
 			}
 		}
-		bullets.removeAll(removeBullet);
-		enemies.removeAll(removeEnemy);
+		
 		
 		//creat enemy ship
 		if(scoreToEnemyShip > 10) {
 			scoreToEnemyShip = 0;
 			enemyShips.add(new EnemyShip(x));
 		}
-
+		
+		// check collision enemy ship with bullet
+		ArrayList<EnemyShip> removeEnemyShip = new ArrayList<EnemyShip>();
+		for(EnemyShip enemyShip: enemyShips) {
+			for(Bullet bullet: bullets) {
+				if(bullet.getCheckCollision().checkCollision(enemyShip.getEnemyShip())) {
+					removeBullet.add(bullet);
+					removeEnemyShip.add(enemyShip);
+					score += 100;
+					collisions.add(new Collision(bullet.x, bullet.y));
+				}
+			}
+		}
+		
+		// creat enemy ship fire
+		for(EnemyShip enemyShip: enemyShips) {
+			enemyShipFireTime += delta;
+			if(enemyShipFireTime > ENEMY_SHIP_FIRE_TIME) {
+			enemyShipFires.add(new EnemyShipFire(enemyShip.x + enemyShip.WIDTH/2));
+			enemyShipFireTime = 0;
+			}
+		}
+		
+		// check collision player with enemy ship fire
+		ArrayList<EnemyShipFire> removeEnemyShipFire = new ArrayList<EnemyShipFire>();
+		for(EnemyShipFire enemyShipFire: enemyShipFires) {
+			if(enemyShipFire.getFire().checkCollision(player)) {
+				health -= 0.1f;
+				removeEnemyShipFire.add(enemyShipFire);
+			}
+		}
+		
+		// remove
+		enemyShips.removeAll(removeEnemyShip);
+		bullets.removeAll(removeBullet);
+		enemies.removeAll(removeEnemy);
+		enemyShipFires.removeAll(removeEnemyShipFire);
+		
 		//update collision
 		ArrayList<Collision> removeCollision = new ArrayList<Collision>();
 		for (Collision collision: collisions) {
@@ -292,6 +334,11 @@ public class GameScreen implements Screen {
 		//draw enemy ship
 		for(EnemyShip enemyShip: enemyShips) {
 			enemyShip.updateAndRender(game.batch, delta);
+		}
+		
+		//update and draw enemy ship fire
+		for(EnemyShipFire enemyShipFire: enemyShipFires) {
+			enemyShipFire.updateAndRender(game.batch, delta);
 		}
 
 		//draw enemies

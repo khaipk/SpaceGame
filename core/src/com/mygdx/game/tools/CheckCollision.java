@@ -2,16 +2,16 @@ package com.mygdx.game.tools;
 
 public class CheckCollision {
 	
-	private int x;
-	private int y;
-	private int width;
-	private int height;
+	private float x;
+	private float y;
+	private float width;
+	private float height;
 	
-	public CheckCollision(int x, int y, int width, int height) {
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
+	public CheckCollision(float x2, float defaultY, float width2, float height2) {
+		this.x = x2;
+		this.y = defaultY;
+		this.width = width2;
+		this.height = height2;
 	}
 	
 	public void move(int x, int y) {
